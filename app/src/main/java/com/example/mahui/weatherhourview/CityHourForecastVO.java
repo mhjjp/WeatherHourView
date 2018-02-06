@@ -1,4 +1,4 @@
-package cn.nmc.data;
+package com.example.mahui.weatherhourview;
 
 import java.util.List;
 

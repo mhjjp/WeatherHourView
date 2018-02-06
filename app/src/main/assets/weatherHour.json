@@ -18,7 +18,7 @@
     {
       "air_pressure": 9999,
       "humidity": 50.4,
-      "temperature": "9999",
+      "temperature": "8",
       "time": "2018-01-15 18:00",
       "timelimit": 0,
       "total_cloud": 77.2,
@@ -88,7 +88,7 @@
     {
       "air_pressure": 9999,
       "humidity": 87,
-      "temperature": "9999",
+      "temperature": "0",
       "time": "2018-01-15 23:00",
       "timelimit": 0,
       "total_cloud": 96.1,
@@ -144,7 +144,7 @@
     {
       "air_pressure": 9999,
       "humidity": 87.9,
-      "temperature": "9999",
+      "temperature": "-6",
       "time": "2018-01-16 03:00",
       "timelimit": 0,
       "total_cloud": 0,

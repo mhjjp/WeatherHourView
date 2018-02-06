@@ -1,4 +1,4 @@
-package cn.nmc.weatherapp.activity.widgets.hour;
+package com.example.mahui.weatherhourview;
 
 /**
  * Created by mac on 2018/1/4.

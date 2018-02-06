@@ -1,4 +1,4 @@
-package cn.nmc.utils;
+package com.example.mahui.weatherhourview;
 
 
 import android.content.Context;
@@ -12,8 +12,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-
-import cn.nmc.weatherapp.BuildConfig;
 
 
 /**
@@ -80,17 +78,7 @@ public class Converter {
     }
 
 
-    /**
-     * 降一个Uri格式的资源文件路径改为一个SD卡上的本地的存储空间
-     *
-     * @param Uri
-     * @return
-     */
-    public static String ConvertUri2Path(String Uri) {
-        String file = Encoder.generate(Uri);
-        file = FileUtils.GetCachedFileFullPath(file);
-        return file;
-    }
+
     /**
      * 将多个目录层次拼接成为一个完整的路径。主要目的是为了处理每个目录名字开头或结尾的 File.separatorChar
      *
@@ -189,84 +177,6 @@ public class Converter {
         return false;
     }
 
-    /**
-     * 返回图片的连接
-     * @param url
-     * @return
-     */
-    public static String AnalysisUrl(String url){
-        Log.i(TAG, "AnalysisUrl: url===="+url);
-        if(isNullOrEmpty(url)){
-            return  "";
-        }
-
-        if(url.startsWith("http") || url.startsWith("assets")){
-            return url;
-        }else{
-
-            try{
-
-                URL tempUrl = new URL(BuildConfig.SERVER_BASE_URL);
 
 
-                String prefix = String.format("%s://%s:%s", tempUrl.getProtocol(), tempUrl.getHost(), tempUrl.getPort()!=-1?tempUrl.getPort():"");
-
-                Log.i(TAG, "解析完url后的URL是===="+CombineUrl(prefix,url));
-                return CombineUrl(prefix,url);
-
-            }catch (Exception e){
-                Log.i(TAG, "AnalysisUrl: e=="+e.getMessage());
-                return  "";
-            }
-
-        }
-
-    }
-
-    /**
-     * 判断url 是否包含http，包含直接返回， 否则拼装成完成的url
-     * @param url
-     * @return
-     */
-    public static String fillUrl(String url){
-
-        if (url != null && !Converter.isEmpty(url)) {
-            if (!url.startsWith("http")) {
-                return  Converter.CombineUrl(BuildConfig.SERVER_BASE_URL, url);
-            }
-        }
-
-        return url;
-
-    }
-
-    /**
-     * district, city, province, count
-     *
-     * @param names
-     * @return
-     */
-    public static String MergeGPSName(String[] names) {
-
-        int index = 0;
-
-        String result = "";
-
-        do {
-
-            if (Converter.isNotEmpty(names[index])) {
-                if (result.isEmpty()) {
-                    result = names[index];
-                } else {
-                    result = (names[index] + " " + result);
-                    break;
-                }
-            }
-
-            index++;
-
-        } while (index < names.length);
-
-        return result;
-    }
 }

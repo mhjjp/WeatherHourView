@@ -1,4 +1,4 @@
-package cn.nmc.weatherapp.activity.widgets.hour;
+package com.example.mahui.weatherhourview;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -21,6 +21,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.alibaba.fastjson.JSON;
+import com.blankj.utilcode.util.ConvertUtils;
+import com.blankj.utilcode.util.ScreenUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,21 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import cn.nmc.data.CityCode;
-import cn.nmc.data.CityHourForecastVO;
-import cn.nmc.network.Downloader;
-import cn.nmc.utils.BitmapUtils;
-import cn.nmc.utils.ConfigUtils;
-import cn.nmc.utils.Converter;
-import cn.nmc.utils.Encoder;
-import cn.nmc.utils.IndicatorUtils;
-import cn.nmc.utils.SharedPreferenceUtils;
-import cn.nmc.utils.TimeUtils;
-import cn.nmc.utils.WeatherLimitUtils;
-import cn.nmc.utils.data.WindUtils;
-import cn.nmc.weatherapp.BuildConfig;
-import cn.nmc.weatherapp.activity.CityWeatherActivity;
-import me.zhouzhuo.zzweatherview.PicUtil;
+
 
 /**
  * Created by mac on 2018/1/4.
@@ -60,7 +48,6 @@ public class HourWeatherDrawScrollerView extends View {
 
     private Path tempLine;
 
-    IndicatorUtils indicator;
 
     private Context context;
     public List<HourCityModel> list = new ArrayList<HourCityModel>();
@@ -76,7 +63,7 @@ public class HourWeatherDrawScrollerView extends View {
     float oldX;
     float oldY;
 
-    private int everWidth = ConfigUtils.devicesWidth / 6;
+    private int everWidth = ScreenUtils.getScreenWidth() / 6;
 
     public HourWeatherDrawScrollerView(Context context) {
         this(context, null);
@@ -84,7 +71,7 @@ public class HourWeatherDrawScrollerView extends View {
 
     public HourWeatherDrawScrollerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        indicator = new IndicatorUtils(context);
+
         this.context = context;
         initPaint();
     }
@@ -102,13 +89,13 @@ public class HourWeatherDrawScrollerView extends View {
 
         dayPaint = new Paint();
         dayPaint.setColor(Color.WHITE);
-        dayPaint.setStrokeWidth(Converter.dip2px(context, 2));
+        dayPaint.setStrokeWidth(ConvertUtils.dp2px(  2));
         dayPaint.setStyle(Paint.Style.STROKE);
         dayPaint.setAntiAlias(true);
 
         textPaint.setColor(Color.WHITE);
         textPaint.setStrokeWidth(4);
-        textPaint.setTextSize(Converter.dip2px(context, 15));
+        textPaint.setTextSize(ConvertUtils.dp2px(  15));
         textPaint.setAntiAlias(true);
 
         rainPaint.setColor(Color.GREEN);
@@ -116,7 +103,7 @@ public class HourWeatherDrawScrollerView extends View {
 
         rainTextPaint.setColor(Color.WHITE);
         rainTextPaint.setStrokeWidth(3);
-        rainTextPaint.setTextSize(Converter.dip2px(context, 10));
+        rainTextPaint.setTextSize(ConvertUtils.dp2px(  10));
         rainTextPaint.setAntiAlias(true);
 
         bgPaint.setColor(Color.parseColor("#00000000"));
@@ -125,8 +112,8 @@ public class HourWeatherDrawScrollerView extends View {
         startY = 10;
 
         oldX = everWidth / 2;
-        oldY = Converter.dip2px(context, 20);
-        tempTopY = Converter.dip2px(context, 71);
+        oldY = ConvertUtils.dp2px(  20);
+        tempTopY = ConvertUtils.dp2px(  71);
     }
 
     @Override
@@ -144,9 +131,9 @@ public class HourWeatherDrawScrollerView extends View {
 
         //当有降水时  底部Y调高一些，防止降水量文字和线重合
         if (rainMax > 0.0f) {
-            tempBottmY = Converter.dip2px(context, 130);
+            tempBottmY = ConvertUtils.dp2px(  130);
         } else {
-            tempBottmY = Converter.dip2px(context, 150);
+            tempBottmY = ConvertUtils.dp2px(  150);
         }
 
         List<List<HourCityModel>> listList = new ArrayList<>();
@@ -160,17 +147,17 @@ public class HourWeatherDrawScrollerView extends View {
 
             //**************绘制图标，时间等**** start *************//
             // 画顶部时间
-            canvas.drawText(hourCityModel.getTime() + "", startX - getTextWidth(textPaint, hourCityModel.getTime() + "") / 2, Converter.dip2px(context, 15), textPaint);
+            canvas.drawText(hourCityModel.getTime() + "", startX - getTextWidth(textPaint, hourCityModel.getTime() + "") / 2, ConvertUtils.dp2px(  15), textPaint);
             startY = tempBottmY - (float) (((hourCityModel.getTemp() - min) / distance) * (tempBottmY - tempTopY));
 
             //画线上的点
-            canvas.drawCircle(startX - Converter.dip2px(context, 2), startY, Converter.dip2px(context, 4), textPaint);
+            canvas.drawCircle(startX - ConvertUtils.dp2px( 2), startY, ConvertUtils.dp2px(  4), textPaint);
             drawRain(canvas, hourCityModel, startX, startY);
             //**************绘制图标，时间等*** end *****************//
 
             //处理线
             hourCityModel.setIndex(i);
-            if(WeatherLimitUtils.weatherTemperture((float) hourCityModel.getTemp())){
+            if(hourCityModel.getTemp()<99.0f){
                 hourCityModels.add(hourCityModel);
             }else{
                 listList.add(hourCityModels);
@@ -258,19 +245,18 @@ public class HourWeatherDrawScrollerView extends View {
 
         if (hourCityModel.getImgIcon() != null && !hourCityModel.getImgIcon().isEmpty() && !hourCityModel.getImgIcon().equalsIgnoreCase("9999")) {
 
-            if (WeatherLimitUtils.weatherIconImgIsRight(hourCityModel.getImgIcon())) {
 
-                Bitmap bitmap = Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), hourCityModel.getImgId()));
-                float scaleWidth = ((float) Converter.dip2px(context, 25)) / bitmap.getWidth();
-                float scaleHeight = ((float) Converter.dip2px(context, 25)) / bitmap.getHeight();
+            Bitmap bitmap = Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), hourCityModel.getImgId()));
+            float scaleWidth = ((float) ConvertUtils.dp2px(  25)) / bitmap.getWidth();
+            float scaleHeight = ((float) ConvertUtils.dp2px(  25)) / bitmap.getHeight();
 
-                /**
-                 * 取得想要缩放的matrix参数
-                 */
-                matrix.postScale(scaleWidth, scaleHeight);
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                canvas.drawBitmap(bitmap, startX - bitmap.getWidth() / 2, Converter.dip2px(context, 22), textPaint);
-            }
+            /**
+             * 取得想要缩放的matrix参数
+             */
+            matrix.postScale(scaleWidth, scaleHeight);
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            canvas.drawBitmap(bitmap, startX - bitmap.getWidth() / 2, ConvertUtils.dp2px(  22), textPaint);
+
         }
 
         /**
@@ -280,7 +266,7 @@ public class HourWeatherDrawScrollerView extends View {
          */
         if (hourCityModel.getTemp() > -99 && hourCityModel.getTemp() < 99) {
             String temp = Math.round(hourCityModel.getTemp()) + "°";
-            canvas.drawText(temp, startX - getTextWidth(textPaint, temp) / 2, startY - Converter.dip2px(context, 8), textPaint);
+            canvas.drawText(temp, startX - getTextWidth(textPaint, temp) / 2, startY - ConvertUtils.dp2px(  8), textPaint);
         }
 
         /**
@@ -292,9 +278,9 @@ public class HourWeatherDrawScrollerView extends View {
             //这里采用 获取最大的降水值 一定的高度 然后按比例画出矩形的高度
 
             float left = startX - 20;
-            float maxTop = Converter.dip2px(context, 140);
+            float maxTop = ConvertUtils.dp2px(  140);
             float right = startX + 20;
-            float bottom = Converter.dip2px(context, 150);
+            float bottom = ConvertUtils.dp2px(  150);
 
             double percent = hourCityModel.getRain() / rainMax;
             float top = bottom - (float) ((bottom - maxTop) * percent);
@@ -311,27 +297,19 @@ public class HourWeatherDrawScrollerView extends View {
          */
         if (hourCityModel.getWindDir() >= 0.0f && hourCityModel.getWindSpeed() <= 360.0f && hourCityModel.getWindSpeed() > 0.0f && hourCityModel.getWindSpeed() < 300.0f) {
 
-            Bitmap windbitmap = Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), PicUtil.getWindImageId(getwindDirect((float) hourCityModel.getWindDir()))));
+            Bitmap windbitmap = Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.d00));
 
             matrix = new Matrix();
-            float scaleWindWidth = ((float) Converter.dip2px(context, 15)) / windbitmap.getWidth();
-            float scaleWindHeight = ((float) Converter.dip2px(context, 15)) / windbitmap.getHeight();
+            float scaleWindWidth = ((float) ConvertUtils.dp2px(  15)) / windbitmap.getWidth();
+            float scaleWindHeight = ((float) ConvertUtils.dp2px(  15)) / windbitmap.getHeight();
             matrix.postScale(scaleWindWidth, scaleWindHeight);
             windbitmap = Bitmap.createBitmap(windbitmap, 0, 0, windbitmap.getWidth(), windbitmap.getHeight(), matrix, true);
 
-            String windLevel = WindUtils.GetWindLevel((float) hourCityModel.getWindSpeed());
-
-            if("微风".equals(windLevel)){
-                float AllW = getTextWidth(textPaint, windLevel) + windbitmap.getWidth() + Converter.dip2px(context, 10);
-                canvas.drawText(windLevel, startX - AllW / 2 + Converter.dip2px(context, 8) + windbitmap.getWidth() / 2, Converter.dip2px(context, 170), textPaint);
-            }else if(!"".equals(windLevel)){
-                windLevel = windLevel + "级";
-                float AllW = getTextWidth(textPaint, windLevel) + windbitmap.getWidth() + Converter.dip2px(context, 10);
-                canvas.drawBitmap(windbitmap, startX - AllW / 2, Converter.dip2px(context, 158), textPaint);
-                canvas.drawText(windLevel, startX - AllW / 2 + Converter.dip2px(context, 8) + windbitmap.getWidth() / 2, Converter.dip2px(context, 170), textPaint);
-            }
+            String  windLevel = "2级";
+            float AllW = getTextWidth(textPaint, windLevel) + windbitmap.getWidth() + ConvertUtils.dp2px(  10);
+            canvas.drawBitmap(windbitmap, startX - AllW / 2, ConvertUtils.dp2px(  158), textPaint);
+            canvas.drawText(windLevel, startX - AllW / 2 + ConvertUtils.dp2px(  8) + windbitmap.getWidth() / 2, ConvertUtils.dp2px(  170), textPaint);
         }
-
     }
 
     @Override
@@ -364,7 +342,7 @@ public class HourWeatherDrawScrollerView extends View {
         }
         if (modeH == MeasureSpec.UNSPECIFIED) {
             //ScrollView和HorizontalScrollView
-            height =  Converter.dip2px(context, 180);
+            height =  ConvertUtils.dp2px(  180);
         }
         //设置宽度和高度
         setMeasuredDimension(width, height);
