@@ -11,29 +11,21 @@ import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
-import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.ConvertUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 
 
 /**
- * Created by mac on 2018/1/4.
+ * Created by mahui on 2018/1/4.
+ * 逐小时气温 画
  */
 
 public class HourWeatherDrawScrollerView extends View {
@@ -136,6 +128,8 @@ public class HourWeatherDrawScrollerView extends View {
             tempBottmY = ConvertUtils.dp2px(  150);
         }
 
+        //处理缺测值
+
         List<List<HourCityModel>> listList = new ArrayList<>();
         List<HourCityModel> hourCityModels = new ArrayList<>();
 
@@ -200,10 +194,10 @@ public class HourWeatherDrawScrollerView extends View {
                 }
             }
 
+            // 华为手机点过多时，线画不成
             if (count > 30) {
 
                 canvas.drawPath(tempLine, dayPaint);
-
 
                 tempLine = new Path();
                 tempLine.moveTo(startX, startY);
